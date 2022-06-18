@@ -65,5 +65,17 @@ describe('server', function() {
     });
   });
 
+  it('Should provide an error on a bad request', function(done) {
+    var requestParams = {
+      method: 'asdfasdg',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+    };
+
+    request(requestParams, function(error, response, body) {
+      expect(response.statusCode).to.equal(400);
+      done();
+    });
+  });
+
 
 });

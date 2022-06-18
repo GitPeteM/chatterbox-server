@@ -86,11 +86,12 @@ var requestHandler = function(request, response) {
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
 
-  if (request.url === '/classes/messages') {
+  if (request.url.includes('/classes/messages')) {
     if (request.method === 'GET') {
       // grab all current messages
       statusCode = 200;
       response.writeHead(statusCode, headers);
+      console.log(storage.getData());
       response.end(JSON.stringify(storage.getData()));
     } else if (request.method === 'POST') {
       //Add message to data structure
@@ -108,8 +109,12 @@ var requestHandler = function(request, response) {
         storage.addData(JSON.parse(data));
 
         response.writeHead(statusCode, headers);
-        response.end('success');
+        response.end(JSON.stringify(data));
       });
+    } else if (request.method === 'OPTIONS') {
+      statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end();
     } else {
       statusCode = 400;
       response.writeHead(statusCode, headers);
