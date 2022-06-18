@@ -91,4 +91,50 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+  it('Should respond with all messages in server storage', function() {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+
+    var stubMsg2 = {
+      username: 'Gary',
+      text: 'Im the Senior.'
+    };
+
+    var req1 = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res1 = new stubs.response();
+
+    var req2 = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    var res2 = new stubs.response();
+
+    handler.requestHandler(req1, res1);
+    handler.requestHandler(req2, res2);
+
+    expect(res1._responseCode).to.equal(201);
+    expect(res2._responseCode).to.equal(201);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data);
+    expect(messages.length).to.be.above(1);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should provide an error on a bad request', function() {
+    // This is a fake server request. Normally, the server would provide this,
+    // but we want to test our function's behavior totally independent of the server code
+    var req = new stubs.request('/classes/messages', 'asdfgjkl');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(400);
+    expect(res._ended).to.equal(true);
+  });
 });
